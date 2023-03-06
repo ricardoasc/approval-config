@@ -1,0 +1,119 @@
+buildscript {
+    ext {
+        springBootVersion = '2.3.10.RELEASE'
+        sonarqubeVersion = '2.8'
+    }
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+        classpath("org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:${sonarqubeVersion}")
+    }
+}
+
+plugins {
+    id 'com.google.protobuf' version '0.8.10'
+    id 'jacoco'
+}
+
+group = 'investment-approval'
+version = '1.0.0'
+
+apply plugin: "java"
+apply plugin: 'idea'
+apply plugin: "org.springframework.boot"
+apply plugin: "org.sonarqube"
+apply from: 'dependencies.gradle'
+apply plugin: 'jacoco'
+
+sourceCompatibility = JavaVersion.VERSION_11
+targetCompatibility = JavaVersion.VERSION_11
+
+jacoco {
+    toolVersion = "0.8.4"
+}
+
+// forces utf-8 encoding for source files
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+}
+
+processResources {
+    filesMatching('application.yml') {
+        expand(project.properties)
+    }
+}
+
+// configure test to run with junit platform
+test {
+    // enable JUnit 5
+    useJUnitPlatform()
+
+    // always run tests, even when nothing changed.
+    dependsOn 'cleanTest'
+}
+
+processResources {
+    filesMatching('application.yml') {
+        expand(project.properties)
+    }
+}
+// configure pretty print of test result to std out
+// for every task that is run as test task
+tasks.withType(Test) {
+    testLogging {
+        events 'passed', 'skipped', 'failed'
+        exceptionFormat "full"
+
+        afterSuite { desc, r ->
+            if (!desc.parent) { // will match the outermost suite
+                def output = "${r.resultType} (${r.testCount} tests, ${r.successfulTestCount} successes, ${r.failedTestCount} failures, ${r.skippedTestCount} skipped)"
+                def startItem = '| ', endItem = ' |'
+                def repeatLength = startItem.length() + output.length() + endItem.length()
+                println('\n' + ('-' * repeatLength) + '\n' + startItem + output + endItem + '\n' + ('-' * repeatLength))
+            }
+        }
+    }
+}
+
+// task that prints project version variable to standard output. This may be used by
+// deployment tools that depends in version inferring.
+task version {
+    doLast {
+        logger.quiet project.version as String
+    }
+}
+
+protobuf {
+    protoc {
+        artifact = "com.google.protobuf:protoc:3.11.2"
+    }
+    plugins {
+        grpc {
+            artifact = "io.grpc:protoc-gen-grpc-java:1.25.0"
+        }
+        reactor {
+            artifact = "com.salesforce.servicelibs:reactor-grpc:1.0.0"
+        }
+    }
+    generateProtoTasks {
+        ofSourceSet("main")*.plugins {
+            grpc { }
+            reactor { }
+        }
+    }
+}
+
+sonarqube {
+    properties {
+        property "sonar.exclusions", "**/Application.java, **/io/sicredi/config/**, **/io/sicredi/dto/**, **/io/sicredi/entity/**, **/io/sicredi/converter/**, **/io/sicredi/enums/**,**/io/sicredi/models/**, **/io/sicredi/error/**, , **/io/sicredi/client/**"
+        property "sonar.host.url", "https://sonarqube.sicredi.in"
+    }
+}
+
+springBoot {
+    buildInfo()
+}
+jacocoTestReport {
+    reports {
+        xml.enabled true
+    }
+}

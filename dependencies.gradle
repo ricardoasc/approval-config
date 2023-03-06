@@ -1,0 +1,63 @@
+ext['platformDependencies_version'] = '6.1.1'
+
+dependencies {
+    implementation platform(group: 'io.sicredi.services.platform', name: 'platform-dependencies', version: platformDependencies_version)
+
+    implementation group: 'io.sicredi.services.platform', name: 'platform-beans-spring-boot-starter'
+    implementation group: 'io.sicredi.services.platform', name: 'platform-trace-spring-boot-starter'
+    implementation group: 'io.sicredi.services.platform', name: 'platform-serializer-spring-boot-starter'
+    implementation group: 'io.sicredi.services.platform', name: 'platform-error-spring-boot-starter'
+    implementation group: 'io.sicredi.services.platform', name: 'platform-vault-spring-boot-starter'
+    implementation group: 'io.sicredi.services.platform', name: 'platform-aws-spring-boot-starter'
+    implementation group: 'io.sicredi.services.platform', name: 'platform-aws'
+    implementation group: 'io.sicredi.services.platform', name: 'platform-functional-spring-boot-starter'
+    implementation group: 'io.sicredi.services.platform', name: 'platform-validation'
+
+    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-webflux'
+    implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-consul-config'
+
+    // Security Token Starter
+    implementation("io.sicredi.services.platform:platform-security-provider:5.1.4")
+    implementation group: 'io.sicredi.services.platform', name: 'platform-security-token-spring-boot-starter'
+
+    // Swagger
+    implementation group: 'io.springfox', name: 'springfox-swagger2', version: '3.0.0-SICREDI'
+    implementation group: 'io.springfox', name: 'springfox-swagger-ui', version: '3.0.0-SICREDI'
+    implementation group: 'io.springfox', name: 'springfox-spring-integration-webflux', version: '3.0.0-SICREDI'
+
+    //orika
+    implementation("ma.glasnost.orika:orika-core:1.5.2")
+
+    // Mongo
+    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-data-mongodb-reactive'
+
+    implementation group: 'org.springframework.integration', name: 'spring-integration-webflux'
+    implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-consul-config'
+
+    // Lombok
+    compileOnly 'org.projectlombok:lombok:1.18.22'
+    annotationProcessor 'org.projectlombok:lombok:1.18.22'
+
+    // Client OkHttp
+    implementation group: 'io.sicredi.services.platform', name: 'platform-consul-thin-client-okhttp'
+
+    // Tracing
+    implementation group: 'io.sicredi.services.platform', name: 'platform-logging-spring-boot-starter'
+    implementation group: 'io.sicredi.services.platform', name: 'platform-trace-spring-boot-starter'
+
+    // Metrics
+    implementation group: 'io.micrometer', name: 'micrometer-core'
+    implementation 'io.micrometer:micrometer-registry-prometheus'
+
+    // JUnit 5
+    testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api'
+    testRuntimeOnly    group: 'org.junit.jupiter', name: 'junit-jupiter-engine'
+
+    // Spring test libraries for testing controllers and other spring components
+    testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test'
+
+    testImplementation("de.flapdoodle.embed:de.flapdoodle.embed.mongo")
+    testImplementation("org.springframework.security:spring-security-test")
+    testImplementation("io.sicredi.common:spring-web-flux-tests:1.0.3-RELEASE")
+
+}

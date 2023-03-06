@@ -1,0 +1,68 @@
+spring:
+  application:
+    # spring application group name
+    group: investment-approval
+    # spring application nam
+    name: investment-approval-config
+
+  # consul distributed properties configuration
+  cloud:
+    # consul host
+    consul:
+      host: ${CONSUL_SERVER_HOST:https://consul.dev-sicredi.in}
+      port: ${CONSUL_SERVER_PORT:443}
+
+      config:
+        name: ${spring.application.group}/${spring.application.name}/${MAJOR_VERSION:v0}
+
+        # do not bootstrap app if consul is not reachable or
+        # unauthorized connection was established
+        fail-fast: true
+
+        # retrieve consul access token from environment var
+        # or assume it's local and token based for dev environments
+        acl-token: ${CONSUL_ACL_TOKEN:ARuzMxhYTrKQdQe5fG5UC4tmcc}
+        format: properties
+
+        # disable consul distributed config watcher
+        watch:
+          enabled: false
+
+    # configure hashicorp vault
+    vault:
+      enabled: true
+
+      # disable spring cloud reactive vault bootstrapping (aws aim role credentials doesnt implement authentication step factory)
+      reactive:
+        enabled: false
+
+      # do not bootstrap app if consul is not reachable or
+      # unauthorized connection was established
+      fail-fast: true
+
+      # retrieve vault authentication type from environment var
+      # or assume it's local and token based
+      authentication: ${VAULT_AUTH:TOKEN}
+      aws-iam:
+        role: ${spring.application.name}
+
+      # local token
+      token: 31f62b77-dd73-6f83-6571-a0d53d1eac26
+
+      # vault host
+      host: ${VAULT_SERVER:vault.dev-sicredi.in}
+      port: 443
+      scheme: https
+
+      lookup:
+        - root-path: secret/database
+          keys:
+            - mongo.app_investment_approval_config.app_investment_approval_config.password
+
+# disable actuator composite health check at consul and vault
+management:
+  health:
+    consul:
+      enabled: false
+    vault:
+      enabled: false

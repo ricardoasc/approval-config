@@ -1,0 +1,51 @@
+include:
+  remote: https://gitlab.sicredi.net/devconsole/dev-console-ci/raw/master/sicredi-devconsole-ci.yaml
+
+stages:
+  - unit-test
+  - build
+  - gate-qualidade-codigo
+  - package
+  - deploy
+  - deploy-prod
+
+"Teste Unitario":
+  extends: .unit-test-gradle
+  image: ${GRADLE_683}
+
+"Build Gradle":
+  extends: .build-gradle-java11
+  image: ${GRADLE_683}
+
+"Gate de Qualidade":
+  extends: .gate-qa
+
+"Build do Docker (Branch)":
+  needs: ["Build Gradle"]
+  extends: .harbor-build-branch
+
+"Build do Docker (Develop)":
+  extends: .harbor-build-develop
+
+"Build do Docker (Tag)":
+  extends: .harbor-build-stage
+
+"Deploy DEV (Branch)":
+  needs: ["Build do Docker (Branch)"]
+  extends: .deploy.k8s.branch
+
+"Deploy DEV (Develop)":
+  extends: .deploy.k8s.dev
+
+"Deploy DEV (Tag)":
+  needs: ["Build do Docker (Tag)"]
+  extends: .deploy.k8s.dev-tag
+
+"Deploy UAT/Homolog (Tag)":
+  extends: .deploy.k8s.uat
+
+"Deploy STRESS/pre-prod (Tag)":
+  extends: .deploy.k8s.stress
+
+"Deploy Producao (Tag)":
+  extends: .deploy.prod
